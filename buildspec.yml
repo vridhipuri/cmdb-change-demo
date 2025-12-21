@@ -1,0 +1,12 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - pip install requests
+  build:
+    commands:
+      - echo "Running AI CMDB change validation"
+      - python call_ai.py
