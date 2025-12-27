@@ -9,7 +9,7 @@ with open("change.json") as f:
 
 response = requests.post(
     SN_API_URL,
-    json={"data": payload},
+    json=payload,
     auth=("admin", "Charlie@22"),
     headers={"Content-Type": "application/json"}
 )
