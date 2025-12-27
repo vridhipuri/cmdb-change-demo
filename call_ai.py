@@ -10,7 +10,7 @@ with open("change.json") as f:
 response = requests.post(
     SN_API_URL,
     json={"data": payload},
-    auth=("admin", "(p-!mPmbHa0xVewdC.QZ{d?c;k:b=7@^^U&j^$mdt?H=!2_kKEQup6?Fv}!;-KUR0]MvijZIj0V.Bza&H^xB1:"),
+    auth=("admin", "Charlie@22"),
     headers={"Content-Type": "application/json"}
 )
 
