@@ -24,12 +24,20 @@ result = resp_json.get("result", resp_json)
 
 decision = result.get("decision")
 
+
 if decision == "BLOCK":
     print("❌ AI blocked the change")
-    sys.exit(1)   # ❌ Fail pipeline
+    sys.exit(1)
+
 elif decision == "APPROVE":
     print("✅ AI approved the change")
     sys.exit(0)
+
+elif decision == "REQUIRES_APPROVAL":
+    print("⏸️ AI requires manual approval")
+    print(f"Change created in ServiceNow: {result.get('change_sys_id')}")
+    sys.exit(2)   # special exit for manual approval
+
 else:
     print("❌ Unknown decision, failing pipeline")
     sys.exit(1)
