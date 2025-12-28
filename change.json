@@ -1,4 +1,6 @@
 {
   "ci_name": "web_server_01",
-  "change_type": "infra_update"
+  "change_type": "infra_update",
+  "short_description": "Urgent infra fix",
+  "description": "Applying patch quickly, minimal testing"
 }
