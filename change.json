@@ -1,6 +1,6 @@
 {
   "ci_name": "web_server_01",
   "change_type": "infra_update",
-  "short_description": "Routine patching",
-  "description": "Standard monthly update"
+  "short_description": "Urgent fix",
+  "description": "Quick patch, partial testing"
 }
