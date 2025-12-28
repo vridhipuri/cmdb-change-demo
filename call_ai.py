@@ -50,7 +50,7 @@ import sys
 
 SN_API_URL = "https://dev339830.service-now.com/api/1835622/cmdbchangevalidationapi/validate"
 
-print("===== LOADING CHANGE PAYLOAD =====")
+print("\n===== LOADING CHANGE PAYLOAD =====")
 with open("change.json") as f:
     payload = json.load(f)
 
@@ -68,69 +68,63 @@ response = requests.post(
 print("\n===== RAW SERVICENOW RESPONSE =====")
 print(response.text)
 
-resp_json = response.json()
+try:
+    resp_json = response.json()
+except Exception:
+    print("❌ Invalid JSON from ServiceNow")
+    sys.exit(1)
 
-# ServiceNow usually wraps response inside "result"
-result = resp_json.get("result", resp_json)
+# ServiceNow wraps everything inside "result"
+result = resp_json.get("result", {})
 
 print("\n===== PARSED RESPONSE =====")
 print(json.dumps(result, indent=2))
 
-decision = result.get("decision")
-ai_risk = result.get("ai_risk")
+decision   = result.get("decision")
+ai_risk    = result.get("ai_risk")
 confidence = result.get("confidence")
-explanation = result.get("ai_explanation") or result.get("reason")
-change_sys_id = result.get("change_sys_id")
-
-# Optional audit data (if returned)
-historical_changes = result.get("historical_changes", [])
-recent_incidents = result.get("recent_incidents", [])
+reason     = result.get("reason")
+change_id  = result.get("change_sys_id")
 
 print("\n===== AI DECISION SUMMARY =====")
 print(f"Decision    : {decision}")
 print(f"AI Risk     : {ai_risk}")
 print(f"Confidence  : {confidence}")
-print(f"Explanation : {explanation}")
-print(f"Change ID   : {change_sys_id}")
+print(f"Explanation : {reason}")
+print(f"Change ID   : {change_id}")
 
-# ---------------- PRINT HISTORY ----------------
-
+# Optional audit visibility (if ServiceNow sends it)
 print("\n===== HISTORICAL CHANGES USED =====")
-if not historical_changes:
-    print("No historical changes provided")
+hist_changes = result.get("historical_changes", [])
+if hist_changes:
+    for ch in hist_changes:
+        print(f"- {ch.get('number')} | {ch.get('short_description')}")
 else:
-    for chg in historical_changes:
-        print(
-            f"{chg.get('number')} | "
-            f"{chg.get('short_description')} | "
-            f"Outcome: {chg.get('outcome')}"
-        )
+    print("No historical changes provided")
 
 print("\n===== RECENT INCIDENTS USED =====")
-if not recent_incidents:
-    print("No incidents provided")
+incidents = result.get("related_incidents", [])
+if incidents:
+    for inc in incidents:
+        print(f"- {inc.get('number')} | {inc.get('short_description')}")
 else:
-    for inc in recent_incidents:
-        print(
-            f"{inc.get('number')} | "
-            f"{inc.get('short_description')}"
-        )
+    print("No incidents provided")
 
-# ---------------- PIPELINE DECISION ----------------
+# ===== PIPELINE CONTROL (THIS WAS YOUR BUG) =====
 
 if decision == "BLOCK":
     print("\n❌ PIPELINE FAILED: AI BLOCKED THE CHANGE")
     sys.exit(1)
 
-elif decision == "REQUIRES_APPROVAL":
-    print("\n⏸️ PIPELINE PAUSED: MANUAL APPROVAL REQUIRED")
-    sys.exit(0)  # pipeline passes, human approval in SN
+elif decision == "APPROVE":
+    print("\n✅ PIPELINE PASSED: AI APPROVED THE CHANGE")
+    sys.exit(0)
 
-elif decision in ["AUTO_APPROVE", "APPROVE"]:
-    print("\n✅ PIPELINE PASSED: CHANGE APPROVED")
+elif decision == "REQUIRES_APPROVAL":
+    print("\n⏸️ PIPELINE PASSED: MANUAL APPROVAL REQUIRED")
+    print("Change created in ServiceNow:", change_id)
     sys.exit(0)
 
 else:
     print("\n❌ PIPELINE FAILED: UNKNOWN DECISION")
     sys.exit(1)
-
