@@ -1,6 +1,6 @@
 {
   "ci_name": "web_server_01",
-  "short_description": "Urgent infra fix",
-  "description": "Applying hotfix without testing",
-  "change_type": "infra_update"
+  "change_type": "infra_update",
+  "short_description": "Routine patching",
+  "description": "Standard monthly update"
 }
