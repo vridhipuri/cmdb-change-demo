@@ -1,6 +1,6 @@
 {
   "ci_name": "web_server_01",
   "change_type": "infra_update",
-  "short_description": "Urgent infra fix",
-  "description": "Applying patch quickly, minimal testing"
+  "short_description": "Routine maintenance",
+  "description": "Applying standard OS patches after full testing and validation"
 }
