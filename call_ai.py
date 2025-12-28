@@ -95,7 +95,11 @@ print(f"Change ID   : {change_id}")
 
 # Optional audit visibility (if ServiceNow sends it)
 print("\n===== HISTORICAL CHANGES USED =====")
-hist_changes = result.get("historical_changes", [])
+audit = result.get("audit_context", {})
+
+hist_changes = audit.get("historical_changes", [])
+incidents = audit.get("related_incidents", [])
+
 if hist_changes:
     for ch in hist_changes:
         print(f"- {ch.get('number')} | {ch.get('short_description')}")
